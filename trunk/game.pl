@@ -21,19 +21,24 @@ nextTurn(Player,NewPlayer) :-
     NewPlayer = true.
 
 start :-
-    initializeCheckerBoard(Board),
+    initializeRafleCheckerBoard(Board),
     initializePlayers(Player),
     run(Board,Player),
     nl.
     
 run(Board,Player) :-
-    canStillPlay(Board,Player),
+    %canStillPlay(Board,Player),
     printCheckerBoard(Board),
     printPlayerTurn(Player),
+    % TODO Détecter les pièces ayant le droit de se mouvoir
+    getStartPositions(Board,Board,Player,StartPositions),
+    %getPrintableStartPositions(StartPositions,PrintableStatPositions),
+    write('Allowed start positions : '),write(StartPositions),nl,
     write('Select the pawn you want to move'),nl,
     read(StartPosition),
+    checkValidPosition(StartPosition,StartPositions),
     generateAllowedMove(Board,StartPosition,Player,Moves),
-    write('Allowed Moves : '),write(Moves),nl,
+    write('Allowed Moves : '),printPositions(Moves),nl,
     write('Select where you want to go'),nl,
     read(MovePosition),nl,
     movePawn(Board,NewBoard,StartPosition,MovePosition,Moves,Player),
@@ -41,14 +46,16 @@ run(Board,Player) :-
     run(NewBoard,NewPlayer).
     
 run(Board,Player) :-
-    canStillPlay(Board,Player),
+    %canStillPlay(Board,Player),
     write('Reselect a correct the pawn you want to move'),nl,
     run(Board,Player).
     
-run(_Board,Player) :-
+run(Board,Player) :-
     Player, !,
+    printCheckerBoard(Board),
     write('Noir a gagné.').
     
-run(_Board,_Player) :-
+run(Board,_Player) :-
+    printCheckerBoard(Board),
     write('Blanc a gagné.').
     

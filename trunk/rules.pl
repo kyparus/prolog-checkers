@@ -5,14 +5,14 @@
 % Check if a '+Position' given by a '+Player' on a '+Board'
 isPositionAllowed(Board,Position,Player) :-
     Player, !,
-    getBoxFromGridPosition(Board,Position,Box),
+    getBoxByPosition(Board,Position,Box),
     nth1(1,Box,'o').
 
 % *extra-logic*
 % Check if a '+Position' given by a '+Player' on a '+Board'
 isPositionAllowed(Board,Position,Player) :-
     \+ Player, !,
-    getBoxFromGridPosition(Board,Position,Box),
+    getBoxByPosition(Board,Position,Box),
     nth1(1,Box,'x').
 
 isPositionAllowed(_Board,Position,_Player)  :-
@@ -27,50 +27,6 @@ canStillPlay(Board,Player) :-
 canStillPlay(Board,Player) :-
     \+ Player,
     existsOnBoard(Board,'x').
-
-% Get the '-BottomLeftPosition' of a '+Position' for a '+Player' on a given '+Board'
-% if there is one
-getNeighbor(Board,Position,Player,State,BottomLeftPosition) :-
-    Player,
-    \+ member(Position,[1,11,21,31,41,51,61,71,81,91]),
-    \+ member(Position,[91,92,93,94,95,96,97,98,99,100]),
-    getBoxFromGridPosition(Board,Position,_Box),
-    BottomLeftPosition is Position + 9,
-    getBoxFromGridPosition(Board,BottomLeftPosition,CheckNewBox),
-    nth1(1,CheckNewBox,State).
-
-% Get the '-BottomRightPosition' of a '+Position' for a '+Player' on a given '+Board'
-% if there is one
-getNeighbor(Board,Position,Player,State,BottomRightPosition) :-
-    Player,
-    \+ member(Position,[10,20,30,40,50,60,70,80,90,100]),
-    \+ member(Position,[91,92,93,94,95,96,97,98,99,100]),
-    getBoxFromGridPosition(Board,Position,_Box),            %ensure given position  exists on this board
-    BottomRightPosition is Position + 11,
-    getBoxFromGridPosition(Board,BottomRightPosition,CheckNewBox), %ensure generated position exists on this board
-    nth1(1,CheckNewBox,State).
-
-% Get the '-TopRightPosition' of a '+Position' for a '+Player' on a given '+Board'
-% if there is one
-getNeighbor(Board,Position,Player,State,TopRightPosition) :-
-    \+ Player,
-    \+ member(Position,[10,20,30,40,50,60,70,80,90,100]),
-    \+ member(Position,[91,92,93,94,95,96,97,98,99,100]),
-    getBoxFromGridPosition(Board,Position,_Box),
-    TopRightPosition is Position - 9,
-    getBoxFromGridPosition(Board,TopRightPosition,CheckNewBox),
-    nth1(1,CheckNewBox,State).
-
-% Get the '-TopLeftPosition' of a '+Position' for a '+Player' on a given '+Board'
-% if there is one
-getNeighbor(Board,Position,Player,State,TopLeftPosition) :-
-    \+ Player,
-    \+ member(Position,[1,11,21,31,41,51,61,71,81,91]),
-    \+ member(Position,[1,2,3,4,5,6,7,8,9,10]),
-    getBoxFromGridPosition(Board,Position,_Box),
-    TopLeftPosition is Position - 11,
-    getBoxFromGridPosition(Board,TopLeftPosition,CheckNewBox),
-    nth1(1,CheckNewBox,State).
 
 generateAllowedMove(Board,StartPosition,Player,Moves) :-
     isPositionAllowed(Board,StartPosition,Player),
@@ -88,51 +44,94 @@ generateAllowedMove(Board,StartPosition,Player,_Moves) :-
     isPositionAllowed(Board,StartPosition,Player),
     write('Pawn at position '),write(StartPosition),write(' cant move'),nl,
     fail.
+
+getStartPositions(Board,Board,Player,RefinedStartPositions) :-
+    generateAllowedStartPosition(Board,Board,Player,StartPositions),
+    findLongestSize(StartPositions,LongestSize),
+    filterStartPositions(StartPositions,LongestSize,RefinedStartPositions).
+
+generateAllowedStartPosition(Board,[Line | OtherLines],Player,StartPositions) :-
+    generateAllowedPositionWithinLines(Board,Line,Player,LineStartPositions),
+    generateAllowedStartPosition(Board,OtherLines,Player,OtherStartPositions),
+    append(LineStartPositions,OtherStartPositions,StartPositions).
+
+generateAllowedStartPosition(_Board,[],_Player,[]).
+
+%jump detected
+generateAllowedPositionWithinLines(Board,[Box | OtherBox],Player,[[StartPosition,JumpSize] | OtherStartPosition]) :-
+    nth1(2,Box,StartPosition),
+    isPositionAllowed(Board,StartPosition,Player),
+    generateAllowedMove(Board,StartPosition,Player,Moves),
+    length(Moves,MovesSize),
+    MovesSize >0,
+    nth1(1,Moves,FirstJump),
+    is_list(FirstJump), !,
+    length(FirstJump,JumpSize),
+    JumpSize > 1, % Jump dectection give list with size > 1. e.g : [43,43,43]
+    generateAllowedPositionWithinLines(Board,OtherBox,Player,OtherStartPosition).
     
-% Jump case
-movePawn(Board,NewBoard,SourcePosition,MovePosition,[[MovePosition |RivalPawnsPosition] | _OtherAvailableMoves],Player) :-
-    Player, !,
-    setBoxStateFromGridPosition(Board,IntermediateBoard1,SourcePosition,'o',' '),
-    setBoxStateFromGridPosition(IntermediateBoard1,IntermediateBoard2,MovePosition  ,' ','o'),
-    moveRivalPawns(IntermediateBoard2,NewBoard,RivalPawnsPosition,Player).
+%move detected
+generateAllowedPositionWithinLines(Board,[Box | OtherBox],Player,[[ StartPosition, 1 ] | OtherStartPosition]) :-
+    nth1(2,Box,StartPosition),
+    isPositionAllowed(Board,StartPosition,Player),
+    generateAllowedMove(Board,StartPosition,Player,Moves),
+    length(Moves,MovesSize),
+    MovesSize >0, !,
+    generateAllowedPositionWithinLines(Board,OtherBox,Player,OtherStartPosition).
 
-movePawn(Board,NewBoard,SourcePosition,MovePosition,[[MovePosition |RivalPawnsPosition] | _OtherAvailableMoves],Player) :-
-    \+ Player, !,
-    setBoxStateFromGridPosition(Board,IntermediateBoard1,SourcePosition,'x',' '),
-    setBoxStateFromGridPosition(IntermediateBoard1,IntermediateBoard2,MovePosition  ,' ','x'),
-    moveRivalPawns(IntermediateBoard2,NewBoard,RivalPawnsPosition,Player).
+generateAllowedPositionWithinLines(Board,[_UnacceptableBox | OtherBox],Player,OtherStartPosition) :-
+    generateAllowedPositionWithinLines(Board,OtherBox,Player,OtherStartPosition).
+    
+generateAllowedPositionWithinLines(_Board,[],_Player,[]).
 
-movePawn(Board,NewBoard,SourcePosition,MovePosition,[_OtherStreak | OtherAvailableMoves],Player) :-
-    movePawn(Board,NewBoard,SourcePosition,MovePosition,OtherAvailableMoves,Player).
+checkValidPosition(ChallengerPosition,[ChallengerPosition | _OtherPosition]) :-
+    !.
+
+checkValidPosition(ChallengerPosition,[_Position | OtherPosition]) :-
+    checkValidPosition(ChallengerPosition,OtherPosition).
+
+checkValidPosition(_ChallengerPosition,[]) :-
+    write('Given position is not allowed !'), nl, fail.
 
 % Simple case
 movePawn(Board,NewBoard,SourcePosition,MovePosition,[MovePosition | _OtherMoves],Player) :-
-    Player, !,
-    setBoxStateFromGridPosition(Board,IntermediateBoard,SourcePosition,'o',' '),
-    setBoxStateFromGridPosition(IntermediateBoard,NewBoard,MovePosition  ,' ','o').
-    
+    Player,
+    \+ is_list(MovePosition), !,
+    setBoxStateByPosition(Board,IntermediateBoard,SourcePosition,'o',' '),
+    setBoxStateByPosition(IntermediateBoard,NewBoard,MovePosition  ,' ','o').
+
 movePawn(Board,NewBoard,SourcePosition,MovePosition,[MovePosition | _OtherMoves],Player) :-
-    \+ Player, !,
-    setBoxStateFromGridPosition(Board,IntermediateBoard,SourcePosition,'x',' '),
-    setBoxStateFromGridPosition(IntermediateBoard,NewBoard,MovePosition  ,' ','x').
+    \+ Player,
+    \+ is_list(MovePosition), !,
+    setBoxStateByPosition(Board,IntermediateBoard,SourcePosition,'x',' '),
+    setBoxStateByPosition(IntermediateBoard,NewBoard,MovePosition  ,' ','x').
+
+% Jump case
+movePawn(Board,NewBoard,SourcePosition,MovePosition,[ Move | _OtherAvailableMoves],Player) :-
+    Player,
+    is_list(Move),
+    nth1(1,Move,Head),
+    Head = MovePosition, !,
+    setBoxStateByPosition(Board,IntermediateBoard1,SourcePosition,'o',' '),
+    setBoxStateByPosition(IntermediateBoard1,IntermediateBoard2,MovePosition  ,' ','o'),
+    select(Head,Move,RivalPawnsPosition),
+    moveRivalPawns(IntermediateBoard2,NewBoard,RivalPawnsPosition,Player).
+
+movePawn(Board,NewBoard,SourcePosition,MovePosition,[Move | _OtherAvailableMoves],Player) :-
+    \+ Player,
+    is_list(Move),
+    nth1(1,Move,Head),
+    Head = MovePosition,  !,
+    setBoxStateByPosition(Board,IntermediateBoard1,SourcePosition,'x',' '),
+    setBoxStateByPosition(IntermediateBoard1,IntermediateBoard2,MovePosition  ,' ','x'),
+    moveRivalPawns(IntermediateBoard2,NewBoard,RivalPawnsPosition,Player),
+    select(Head,Move,RivalPawnsPosition),
+    moveRivalPawns(IntermediateBoard2,NewBoard,RivalPawnsPosition,Player).
 
 movePawn(Board,NewBoard,SourcePosition,MovePosition,[_MovePosition | OtherMoves],Player) :-
-    movePawn(Board,NewBoard,SourcePosition,MovePosition,OtherMoves,Player).
+    movePawn(Board,NewBoard,SourcePosition,MovePosition,OtherMoves,Player), !.
 
-movePawn(_Board,_NewBoard,SourcePosition,MovePosition,[],_Player) :-
-    write('Your move from '),write(SourcePosition),write(' to '),write(MovePosition),write(' is not valid.'),nl,
-    fail.
-    
-moveRivalPawns(Board,NewBoard,[PawnPosition |OtherPositions],Player) :-
-    Player, !,
-    setBoxStateFromGridPosition(Board,IntermediateBoard,PawnPosition,'x',' '),
-    moveRivalPawns(IntermediateBoard,NewBoard,OtherPositions,Player).
-
-moveRivalPawns(Board,NewBoard,[PawnPosition |OtherPositions],Player) :-
-    \+ Player, !,
-    setBoxStateFromGridPosition(Board,IntermediateBoard,PawnPosition,'o',' '),
-    moveRivalPawns(IntermediateBoard,NewBoard,OtherPositions,Player).
-
-moveRivalPawns(FinalBoard,FinalBoard,[],_Player).
+movePawn(_Board,_NewBoard,_SourcePosition,_MovePosition,[],_Player) :-
+    write('Move position is not allowed !'), nl, fail.
 
 
