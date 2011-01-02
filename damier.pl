@@ -1,111 +1,6 @@
 % Author: Dream Team
 % Date: 08/12/2010
 % Damier
-
-printNChar(Char,N) :-
-    N > 0,
-    put_char(Char),
-    N1 is N - 1,
-    printNChar(Char,N1).
-
-printTopLine :-
-    put_char(0x2554),
-    put_char(0x2550),
-    put_char(0x2566),
-    put_char(0x2550),
-    put_char(0x2566),
-    put_char(0x2550),
-    put_char(0x2566),
-    put_char(0x2550),
-    put_char(0x2566),
-    put_char(0x2550),
-    put_char(0x2566),
-    put_char(0x2550),
-    put_char(0x2566),
-    put_char(0x2550),
-    put_char(0x2566),
-    put_char(0x2550),
-    put_char(0x2566),
-    put_char(0x2550),
-    put_char(0x2566),
-    put_char(0x2550),
-    put_char(0x2557),
-    nl.
-    
-printInterLine :-
-    put_char(0x2560),
-    put_char(0x2550),
-    put_char(0x256C),
-    put_char(0x2550),
-    put_char(0x256C),
-    put_char(0x2550),
-    put_char(0x256C),
-    put_char(0x2550),
-    put_char(0x256C),
-    put_char(0x2550),
-    put_char(0x256C),
-    put_char(0x2550),
-    put_char(0x256C),
-    put_char(0x2550),
-    put_char(0x256C),
-    put_char(0x2550),
-    put_char(0x256C),
-    put_char(0x2550),
-    put_char(0x256C),
-    put_char(0x2550),
-    put_char(0x2563),
-    nl.
-
-printBottomLine :-
-    put_char(0x255A),
-    put_char(0x2550),
-    put_char(0x2569),
-    put_char(0x2550),
-    put_char(0x2569),
-    put_char(0x2550),
-    put_char(0x2569),
-    put_char(0x2550),
-    put_char(0x2569),
-    put_char(0x2550),
-    put_char(0x2569),
-    put_char(0x2550),
-    put_char(0x2569),
-    put_char(0x2550),
-    put_char(0x2569),
-    put_char(0x2550),
-    put_char(0x2569),
-    put_char(0x2550),
-    put_char(0x2569),
-    put_char(0x2550),
-    put_char(0x255D),
-    nl.
-    
-printLine([Box|Tail]) :-
-    put_char(0x2551),
-    getChar(Box,Char),
-    put_char(Char),
-    printLine(Tail).
-    
-printLine([]) :-
-    put_char(0x2551),
-    nl.
-    
-printEveryLine([Line | Tail]) :-
-    length([Line | Tail],Size),
-    Size > 1,
-    printLine(Line),
-    printInterLine,
-    printEveryLine(Tail).
-
-printEveryLine([Line | _Tail]) :-
-    printLine(Line).
-
-printEveryLine([]).
-
-printCheckerBoard(CheckerBoard) :-
-    printTopLine,
-    printEveryLine(CheckerBoard),
-    printBottomLine.
     
 % Initialize a checkboard for a game
 % case are encoded like [Character,GridPosition,ManouryPosition]
@@ -120,6 +15,36 @@ initializeEmptyCheckerBoard(CheckerBoard) :-
     [[' ',51,26],[' ',52, 0],[' ',53,27],[' ',54, 0],[' ',55,28],[' ',56, 0],[' ',57,29],[' ',58, 0],[' ',59,30],[' ',60, 0]],
     [[' ',61, 0],[' ',62,31],[' ',63, 0],[' ',64,32],[' ',65, 0],[' ',66,33],[' ',67, 0],[' ',68,34],[' ',69, 0],[' ',70,35]],
     [[' ',71,36],[' ',72, 0],[' ',73,37],[' ',74, 0],[' ',75,38],[' ',76, 0],[' ',77,39],[' ',78, 0],[' ',79,40],[' ',80, 0]],
+    [[' ',81, 0],[' ',82,41],[' ',83, 0],[' ',84,42],[' ',85, 0],[' ',86,43],[' ',87, 0],[' ',88,44],[' ',89, 0],[' ',90,45]],
+    [[' ',91,46],[' ',92, 0],[' ',93,47],[' ',94, 0],[' ',95,48],[' ',96, 0],[' ',97,49],[' ',98, 0],[' ',99,50],[' ',100,0]]
+    ].
+
+% Initialize a checkboard for a game
+% case are encoded like [Character,GridPosition,ManouryPosition]
+% 0 are used for non-Manoury position
+initializeWhiteWonCheckerBoard(CheckerBoard) :-
+    CheckerBoard = [
+    [[' ', 1, 0],[' ', 2, 1],[' ', 3, 0],[' ', 4, 2],[' ', 5, 0],[' ', 6, 3],[' ', 7, 0],[' ', 8, 4],[' ', 9, 0],[' ',10, 5]],
+    [[' ',11, 6],[' ',12, 0],[' ',13, 7],[' ',14, 0],[' ',15, 8],[' ',16, 0],[' ',17, 9],[' ',18, 0],[' ',19,10],[' ',20, 0]],
+    [[' ',21, 0],[' ',22,11],[' ',23, 0],[' ',24,12],[' ',25, 0],[' ',26,13],[' ',27, 0],[' ',28,14],[' ',29, 0],[' ',30,15]],
+    [[' ',31,16],[' ',32, 0],[' ',33,17],[' ',34, 0],[' ',35,18],[' ',36, 0],[' ',37,19],[' ',38, 0],[' ',39,20],[' ',40, 0]],
+    [[' ',41, 0],[' ',42,21],[' ',43, 0],[' ',44,22],[' ',45, 0],[' ',46,23],[' ',47, 0],[' ',48,24],[' ',49, 0],[' ',50,25]],
+    [[' ',51,26],[' ',52, 0],['o',53,27],[' ',54, 0],[' ',55,28],[' ',56, 0],[' ',57,29],[' ',58, 0],[' ',59,30],[' ',60, 0]],
+    [[' ',61, 0],[' ',62,31],[' ',63, 0],['x',64,32],[' ',65, 0],[' ',66,33],[' ',67, 0],[' ',68,34],[' ',69, 0],[' ',70,35]],
+    [[' ',71,36],[' ',72, 0],[' ',73,37],[' ',74, 0],[' ',75,38],[' ',76, 0],[' ',77,39],[' ',78, 0],[' ',79,40],[' ',80, 0]],
+    [[' ',81, 0],[' ',82,41],[' ',83, 0],[' ',84,42],[' ',85, 0],[' ',86,43],[' ',87, 0],[' ',88,44],[' ',89, 0],[' ',90,45]],
+    [[' ',91,46],[' ',92, 0],[' ',93,47],[' ',94, 0],[' ',95,48],[' ',96, 0],[' ',97,49],[' ',98, 0],[' ',99,50],[' ',100,0]]
+    ].
+initializeBlackWonCheckerBoard(CheckerBoard) :-
+    CheckerBoard = [
+    [[' ', 1, 0],[' ', 2, 1],[' ', 3, 0],[' ', 4, 2],[' ', 5, 0],[' ', 6, 3],[' ', 7, 0],[' ', 8, 4],[' ', 9, 0],[' ',10, 5]],
+    [[' ',11, 6],[' ',12, 0],[' ',13, 7],[' ',14, 0],[' ',15, 8],[' ',16, 0],[' ',17, 9],[' ',18, 0],[' ',19,10],[' ',20, 0]],
+    [[' ',21, 0],[' ',22,11],[' ',23, 0],[' ',24,12],[' ',25, 0],[' ',26,13],[' ',27, 0],[' ',28,14],[' ',29, 0],[' ',30,15]],
+    [[' ',31,16],[' ',32, 0],[' ',33,17],[' ',34, 0],[' ',35,18],[' ',36, 0],[' ',37,19],[' ',38, 0],[' ',39,20],[' ',40, 0]],
+    [[' ',41, 0],[' ',42,21],[' ',43, 0],[' ',44,22],[' ',45, 0],[' ',46,23],[' ',47, 0],[' ',48,24],[' ',49, 0],[' ',50,25]],
+    [[' ',51,26],[' ',52, 0],['o',53,27],[' ',54, 0],[' ',55,28],[' ',56, 0],[' ',57,29],[' ',58, 0],[' ',59,30],[' ',60, 0]],
+    [[' ',61, 0],[' ',62,31],[' ',63, 0],[' ',64,32],[' ',65, 0],[' ',66,33],[' ',67, 0],[' ',68,34],[' ',69, 0],[' ',70,35]],
+    [['x',71,36],[' ',72, 0],[' ',73,37],[' ',74, 0],[' ',75,38],[' ',76, 0],[' ',77,39],[' ',78, 0],[' ',79,40],[' ',80, 0]],
     [[' ',81, 0],[' ',82,41],[' ',83, 0],[' ',84,42],[' ',85, 0],[' ',86,43],[' ',87, 0],[' ',88,44],[' ',89, 0],[' ',90,45]],
     [[' ',91,46],[' ',92, 0],[' ',93,47],[' ',94, 0],[' ',95,48],[' ',96, 0],[' ',97,49],[' ',98, 0],[' ',99,50],[' ',100,0]]
     ].
@@ -161,6 +86,22 @@ initializeCheckerBoard(CheckerBoard) :-
 getChar(Box,Char) :-
     nth1(1,Box,Char).
 
+% MANOURY POSITION
+
+getBoxByPosition([Line | _Tail],Position,Box) :-
+    searchBoxInLineByPosition(Line,Position,Box), !.
+
+getBoxByPosition([_Line | Tail],Position,Box) :-
+    getBoxByPosition(Tail,Position,Box).
+
+searchBoxInLineByPosition([[State,GridPosition,Position] |_Tail],Position,[State,GridPosition,Position]) :-
+    !.
+
+searchBoxInLineByPosition([_FooBox | Tail],Position,Box) :-
+    searchBoxInLineByPosition(Tail,Position,Box).
+    
+% GRID POSITION
+
 getBoxFromGridPosition([Line | _Tail],Position,Box) :-
     searchBoxInLineFromGridPosition(Line,Position,Box), !.
 
@@ -199,7 +140,52 @@ existsOnLine([[State,_Position,_ManouryPosition] | _Tail], State).
 % FALLBACK Case
 existsOnLine([[_OtherState,_Position,_ManouryPosition] | Tail], State) :-
         existsOnLine(Tail,State).
+
+% MANOURY POSITION
+
+%From a '+Board', change box state from '+SourcePosition' to '+Destination' box and print it on '-NewBoard'
+setBoxByPosition(Board,NewBoard,SourcePosition,DestinationPosition,NewState) :-
+    setBoxStateByPosition(Board,IntermediateBoard,SourcePosition,NewState,' '),
+    setBoxStateByPosition(IntermediateBoard,NewBoard,DestinationPosition,' ',NewState).
+
+% Analysis line per line
+% *CUTTED*
+setBoxStateByPosition([Line | Tail],[ModifiedLine | Tail],Position,OldState,NewState) :-
+    setBoxStateInLineByPosition(Line,ModifiedLine,Position,OldState,NewState), !.
+
+% Analysis line per line
+% -> Analyse next line
+setBoxStateByPosition([Line | OldTail],[Line | ModifiedTail],Position,OldState,NewState) :-
+    setBoxStateByPosition(OldTail,ModifiedTail,Position,OldState,NewState).
+
+% Analysis box per box
+% box found
+% *CUTTED*
+setBoxStateInLineByPosition(
+    [[OldState,GridPosition,ManouryPosition] | Tail],
+    [[NewState,GridPosition,ManouryPosition] | Tail],
+    ManouryPosition,
+    OldState,
+    NewState) :-
+    !.
+
+% Analysis box per box
+% box not found
+% -> Analyse next line
+setBoxStateInLineByPosition(
+    [ Box | OldTail],
+    [ Box | ModifiedTail],
+    Position,
+    OldState,
+    NewState) :-
+    setBoxStateInLineByPosition(
+        OldTail,
+        ModifiedTail,
+        Position,
+        OldState,
+        NewState).
     
+% GRID POSITION
     
 %From a '+Board', change box state from '+SourcePosition' to '+Destination' box and print it on '-NewBoard'
 setBoxFromGridPosition(Board,NewBoard,SourcePosition,DestinationPosition,NewState) :-
