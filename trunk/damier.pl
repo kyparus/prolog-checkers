@@ -1,8 +1,8 @@
 % Author: Dream Team
 % Date: 08/12/2010
-% Damier
+% Checkerboard predicates.
     
-% Initialize a checkboard for a game
+% Initialize a empty checkboard for test purpose
 % case are encoded like [Character,GridPosition,ManouryPosition]
 % 0 are used for non-Manoury position
 initializeEmptyCheckerBoard(CheckerBoard) :-
@@ -19,7 +19,7 @@ initializeEmptyCheckerBoard(CheckerBoard) :-
     [[' ',91,46],[' ',92, 0],[' ',93,47],[' ',94, 0],[' ',95,48],[' ',96, 0],[' ',97,49],[' ',98, 0],[' ',99,50],[' ',100,0]]
     ].
 
-% Initialize a checkboard for a game
+% Initialize a checkboard where white can won for test purpose
 % case are encoded like [Character,GridPosition,ManouryPosition]
 % 0 are used for non-Manoury position
 initializeWhiteWonCheckerBoard(CheckerBoard) :-
@@ -35,6 +35,10 @@ initializeWhiteWonCheckerBoard(CheckerBoard) :-
     [[' ',81, 0],[' ',82,41],[' ',83, 0],[' ',84,42],[' ',85, 0],[' ',86,43],[' ',87, 0],[' ',88,44],[' ',89, 0],[' ',90,45]],
     [[' ',91,46],[' ',92, 0],[' ',93,47],[' ',94, 0],[' ',95,48],[' ',96, 0],[' ',97,49],[' ',98, 0],[' ',99,50],[' ',100,0]]
     ].
+
+% Initialize a checkboard where black can won for test purpose
+% case are encoded like [Character,GridPosition,ManouryPosition]
+% 0 are used for non-Manoury position
 initializeBlackWonCheckerBoard(CheckerBoard) :-
     CheckerBoard = [
     [[' ', 1, 0],[' ', 2, 1],[' ', 3, 0],[' ', 4, 2],[' ', 5, 0],[' ', 6, 3],[' ', 7, 0],[' ', 8, 4],[' ', 9, 0],[' ',10, 5]],
@@ -49,7 +53,7 @@ initializeBlackWonCheckerBoard(CheckerBoard) :-
     [[' ',91,46],[' ',92, 0],[' ',93,47],[' ',94, 0],[' ',95,48],[' ',96, 0],[' ',97,49],[' ',98, 0],[' ',99,50],[' ',100,0]]
     ].
 
-% Initialize a checkboard for a game
+% Initialize a checkboard where a rafle is possibnle for test purpose
 % case are encoded like [Character,GridPosition,ManouryPosition]
 % 0 are used for non-Manoury position
 initializeRafleCheckerBoard(CheckerBoard) :-
@@ -57,7 +61,7 @@ initializeRafleCheckerBoard(CheckerBoard) :-
     [[' ', 1, 0],[' ', 2, 1],[' ', 3, 0],[' ', 4, 2],[' ', 5, 0],[' ', 6, 3],[' ', 7, 0],[' ', 8, 4],[' ', 9, 0],[' ',10, 5]],
     [[' ',11, 6],[' ',12, 0],[' ',13, 7],[' ',14, 0],[' ',15, 8],[' ',16, 0],[' ',17, 9],[' ',18, 0],[' ',19,10],[' ',20, 0]],
     [[' ',21, 0],[' ',22,11],[' ',23, 0],['x',24,12],[' ',25, 0],['x',26,13],[' ',27, 0],[' ',28,14],[' ',29, 0],[' ',30,15]],
-    [[' ',31,16],[' ',32, 0],[' ',33,17],[' ',34, 0],['o',35,18],[' ',36, 0],[' ',37,19],[' ',38, 0],[' ',39,20],[' ',40, 0]],
+    [[' ',31,16],[' ',32, 0],['o',33,17],[' ',34, 0],['o',35,18],[' ',36, 0],[' ',37,19],[' ',38, 0],[' ',39,20],[' ',40, 0]],
     [[' ',41, 0],[' ',42,21],[' ',43, 0],[' ',44,22],[' ',45, 0],['x',46,23],[' ',47, 0],[' ',48,24],[' ',49, 0],[' ',50,25]],
     [[' ',51,26],[' ',52, 0],[' ',53,27],[' ',54, 0],[' ',55,28],[' ',56, 0],[' ',57,29],[' ',58, 0],[' ',59,30],[' ',60, 0]],
     [[' ',61, 0],[' ',62,31],[' ',63, 0],['x',64,32],[' ',65, 0],['x',66,33],[' ',67, 0],['x',68,34],[' ',69, 0],[' ',70,35]],
@@ -83,63 +87,50 @@ initializeCheckerBoard(CheckerBoard) :-
     [['x',91,46],[' ',92, 0],['x',93,47],[' ',94, 0],['x',95,48],[' ',96, 0],['x',97,49],[' ',98, 0],['x',99,50],[' ',100,0]]
     ].
     
-getChar(Box,Char) :-
-    nth1(1,Box,Char).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+getChar([Char,_GridPosition,_ManouryPosition],Char).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % MANOURY POSITION
 
-getBoxByPosition([Line | _Tail],Position,Box) :-
-    searchBoxInLineByPosition(Line,Position,Box), !.
-
-getBoxByPosition([_Line | Tail],Position,Box) :-
+% Search for a given -Box within a +Board located at given +Position
+getBoxByPosition([Line | Tail],Position,Box) :-
+    searchBoxInLineByPosition(Line,Position,Box);
     getBoxByPosition(Tail,Position,Box).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Search for a given -Box within a +Line located at given +Position
+% CUTTED
 searchBoxInLineByPosition([[State,GridPosition,Position] |_Tail],Position,[State,GridPosition,Position]) :-
     !.
 
+% Search for a given -Box within a +Line located at given +Position
 searchBoxInLineByPosition([_FooBox | Tail],Position,Box) :-
     searchBoxInLineByPosition(Tail,Position,Box).
-    
-% GRID POSITION
 
-getBoxFromGridPosition([Line | _Tail],Position,Box) :-
-    searchBoxInLineFromGridPosition(Line,Position,Box), !.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-getBoxFromGridPosition([_Line | Tail],Position,Box) :-
-    getBoxFromGridPosition(Tail,Position,Box).
-
-searchBoxInLineFromGridPosition([[State,Position,ManouryPosition] |_Tail],Position,Box) :-
-    !, [State,Position,ManouryPosition] = Box.
-
-searchBoxInLineFromGridPosition([_GridBox | Tail],Position,Box) :-
-    searchBoxInLineFromGridPosition(Tail,Position,Box).
-    
-% Search on given '+Board' if the given '+State' exists
-% @param [Line | Tail]
-%       the board
-% @param State
-%   researched state
-% SUCCESS Case
+% Search within a '+Board' if the given '+State' exists
 existsOnBoard([Line | Tail],State) :-
     existsOnLine(Line,State);
     existsOnBoard(Tail,State).
-    
-% Search on given '+Line' if the given '+State' exists
-% @param [[State,_Position,_ManouryPosition] | _Tail]
-%       the line
-% @param State
-%   researched state
-% SUCCESS Case
-existsOnLine([[State,_Position,_ManouryPosition] | _Tail], State).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Search on given '+Line' if the given '+State' exists
-% @param [[State,_Position,_ManouryPosition] | _Tail]
-%       the line
-% @param State
-%   researched state
-% FALLBACK Case
-existsOnLine([[_OtherState,_Position,_ManouryPosition] | Tail], State) :-
+% CUTTED
+existsOnLine([[State,_Position,_ManouryPosition] | _Tail], State) :-
+    !.
+
+% Search on given '+Line' if the given '+State' exists
+existsOnLine([_WrongBox | Tail], State) :-
         existsOnLine(Tail,State).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % MANOURY POSITION
 
@@ -148,19 +139,21 @@ setBoxByPosition(Board,NewBoard,SourcePosition,DestinationPosition,NewState) :-
     setBoxStateByPosition(Board,IntermediateBoard,SourcePosition,NewState,' '),
     setBoxStateByPosition(IntermediateBoard,NewBoard,DestinationPosition,' ',NewState).
 
-% Analysis line per line
-% *CUTTED*
-setBoxStateByPosition([Line | Tail],[ModifiedLine | Tail],Position,OldState,NewState) :-
-    setBoxStateInLineByPosition(Line,ModifiedLine,Position,OldState,NewState), !.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Analysis line per line
-% -> Analyse next line
+%Change box state within a +Line at +Position from +OldState to +NewState and print it -ModifiedLine
+% CUTTED
+setBoxStateByPosition([Line | Tail],[ModifiedLine | Tail],Position,OldState,NewState) :-
+    setBoxStateInLineByPosition(Line,ModifiedLine,Position,OldState,NewState) , !.
+    
+%Change box state within a +Line at +Position from +OldState to +NewState and print it -ModifiedLine
 setBoxStateByPosition([Line | OldTail],[Line | ModifiedTail],Position,OldState,NewState) :-
     setBoxStateByPosition(OldTail,ModifiedTail,Position,OldState,NewState).
 
-% Analysis box per box
-% box found
-% *CUTTED*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Change +OldState to +NewState if given box is at +ManouryPosition
+%CUTTED
 setBoxStateInLineByPosition(
     [[OldState,GridPosition,ManouryPosition] | Tail],
     [[NewState,GridPosition,ManouryPosition] | Tail],
@@ -169,9 +162,7 @@ setBoxStateInLineByPosition(
     NewState) :-
     !.
 
-% Analysis box per box
-% box not found
-% -> Analyse next line
+%Change +OldState to +NewState if given box is at +ManouryPosition
 setBoxStateInLineByPosition(
     [ Box | OldTail],
     [ Box | ModifiedTail],
@@ -184,13 +175,18 @@ setBoxStateInLineByPosition(
         Position,
         OldState,
         NewState).
-    
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % GRID POSITION
+% DEPRECATED
     
 %From a '+Board', change box state from '+SourcePosition' to '+Destination' box and print it on '-NewBoard'
 setBoxFromGridPosition(Board,NewBoard,SourcePosition,DestinationPosition,NewState) :-
     setBoxStateFromGridPosition(Board,IntermediateBoard,SourcePosition,NewState,' '),
     setBoxStateFromGridPosition(IntermediateBoard,NewBoard,DestinationPosition,' ',NewState).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Analysis line per line
 % *CUTTED*
@@ -201,6 +197,8 @@ setBoxStateFromGridPosition([Line | Tail],[ModifiedLine | Tail],Position,OldStat
 % -> Analyse next line
 setBoxStateFromGridPosition([Line | OldTail],[Line | ModifiedTail],Position,OldState,NewState) :-
     setBoxStateFromGridPosition(OldTail,ModifiedTail,Position,OldState,NewState).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Analysis box per box
 % box found
@@ -222,8 +220,7 @@ setBoxstateInLineFromGridPosition(
     Position,
     OldState,
     NewState) :-
-    
-setBoxstateInLineFromGridPosition(
+  setBoxstateInLineFromGridPosition(
     OldTail,
     ModifiedTail,
     Position,
