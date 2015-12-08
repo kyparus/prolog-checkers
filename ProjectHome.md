@@ -1,0 +1,1 @@
+A checkers game developped in prolog
